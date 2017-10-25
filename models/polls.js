@@ -1,36 +1,38 @@
-var
-  mongoose= require('mongoose');
-  Schema = mongoose.Schema;
+var mongoose= require('mongoose');
+var Schema = mongoose.Schema;
+var findIndex = require('lodash.findindex')
 
 var PollSchema = new Schema({
-  name: String,
-  text: String,
+  name: { type: String, required: true },
+  text: { type: String, required: true },
   countries: [],
-  startDate: {type: Date},
-  endDate: {type: Date},
-  status: String,
-  voteAction: String, //evict,nominate,save
-  voteType: String, // single || multiple
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  status: { type: String, required: true },
+  // voteAction: { type: String, required: true }, //evict,nominate,save
+  voteType: { type: String, required: true }, // single || multiple
   mechanics: {
-    count: Number,
-    rule: String
+    count: { type: Number, required: true },
+    rule: { type: String, required: true },
   },
   options: [{
-    optionName: String,
-    thumbnail: String, //image url
+    optionName: { type: String, required: true },
+    thumbnail: { type: String }, //image url
     //id ref of candidate
-    votes: Number
+    votes: 0,
   }],
-  chartType: String,
-  creator: String
-}, { timestamps: true);
+  chartType: { type: String },
+  creator: { type: mongoose.Schema.Types.ObjectId, required: true },
+}, { timestamps: true});
 
-PollSchema.methods.updateVotes = function(optionnumber){
-  if(typeof optionnumber === 'number' && optionnumber<this.options.length){
-    this.options[optionnumber].votes+=1;
-  }
+PollSchema.methods.updateVotes = function(votes){
+  votes.map(item => {
+    const itemIndex = findIndex(item)
+    this.options[itemIndex].votes+=1;
+  })
+  return this.options
 }
 
 
 var Polls = mongoose.model('Polls', PollSchema);
-module.exports= Polls;
+module.exports = Polls;

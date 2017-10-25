@@ -4,9 +4,12 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var mongoose = require('mongoose');
 var index = require('./routes/index');
 var users = require('./routes/users');
+var polls = require('./routes/polls');
+var votes = require('./routes/votes');
+var logs = require('./routes/logs');
 
 var app = express();
 
@@ -24,6 +27,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/polls', polls);
+app.use('/votes', votes);
+app.use('/logs', logs);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -41,6 +47,15 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+var dburi = process.env.MONGODB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/polling'
+mongoose.connect(dburi, function (err, res) {
+    if (err) {
+        console.log ('ERROR connecting to: ' + dburi + '. ' + err);
+    } else {
+        console.log ('Succeeded connected to: ' + dburi);
+    }
 });
 
 module.exports = app;

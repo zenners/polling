@@ -1,11 +1,10 @@
-var
-  mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
- var userScheme = new Schema({
-
-  votedPolls: ['77']
- });
+ var userSchema = new Schema({
+   name: {type: String, required: true},
+   votedPolls: []
+ },{timestamps: true});
 
 // create canVote boolean, accepts rule and pollid
 // create map of rules to function to apply to user and poll
@@ -15,7 +14,7 @@ function votePerDay(user,poll){
   // code to check if the user has voted today
 }
 
-userScheme.methods.hasVoted =  function(pollid){
+userSchema.methods.hasVoted =  function(pollid){
   var check = false;
   for(var i=0; i<this.votedPolls.length; i++){
     if(this.votedPolls[i] ==  pollid){
@@ -30,5 +29,9 @@ userScheme.methods.hasVoted =  function(pollid){
   return check;
 }
 
-var User = mongoose.model('User', userScheme);
-module.exports = User;
+userSchema.methods.updateVotedPolls = function(pollid){
+  this.votedPolls.concat(pollid)
+  return this.votedPolls
+}
+
+module.exports = userSchema;
